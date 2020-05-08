@@ -1,8 +1,10 @@
 Auto-generate and send an email of selected technical charts and fundamental data for watchlist of UK equities.
 
-Uses Gmail to send.
+Uses Gmail to send
 
-Currently sends technical charts with:
+Currently uses Yahoo prices to calculate Technicals and screen-scrapes financial websites (Investors Chronicle) to pull Fundamentals.
+
+Technical charts include:
 
 * Close (line) & Volume (bar)
 * Stochastic Oscillator
@@ -37,6 +39,7 @@ Python libraries required:
 * spongecake-financials (https://github.com/InPursuitOfHisOwnHat/spongecake-financials)
 * matplotlib
 * pandas
+* pandas_datareader
 
 Requires a comma-separated file of TIDMs and Company names called 'watchlist' in the app's root directory, e.g:
 
