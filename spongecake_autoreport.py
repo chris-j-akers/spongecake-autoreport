@@ -12,35 +12,38 @@ import html_formatting
 import emailer
 
 
-def get_technicals_chart_for_instrument(df_prices, instrument_description):
+def get_technicals_chart_for_instrument(df_prices, 
+                                        instrument_description, 
+                                        figsize=(25,6),
+                                        linewidth=3):
     '''
     Returns a 3 chart Matplotlib figure of Close & Vol, Stochastic Oscillator and MACD.
     '''
     index_min_date = min(df_prices.index)
     index_max_date = max(df_prices.index)
 
-    fig = plt.figure(figsize=(25,6))
+    fig = plt.figure(figsize=figsize)
 
     close_axes = fig.add_subplot(311)
     close_axes.set_title('{0} Price / Volume'.format(instrument_description), {'fontweight': 'bold'})
-    close_axes.plot(df_prices[[TechnicalsDataColumns.COL_CLOSE]], color='black', linewidth=3)
+    close_axes.plot(df_prices[[TechnicalsDataColumns.COL_CLOSE]], color='black', linewidth=linewidth)
     volume_axes = close_axes.twinx()
     volume_axes.bar(df_prices.index, df_prices[TechnicalsDataColumns.COL_VOLUME], color='grey')
     plt.ticklabel_format(style='plain', axis='y')
 
     stochastic_axes = fig.add_subplot(312)
-    stochastic_axes.plot(df_prices[[TechnicalsDataColumns.COL_STOCHASTIC_K]], color='blue', linewidth=3)
-    stochastic_axes.plot(df_prices[[TechnicalsDataColumns.COL_STOCHASTIC_D]], color='red', linewidth=3)
-    stochastic_axes.plot([index_min_date, index_max_date],[80,80], color='grey', linewidth=3, linestyle='--')
-    stochastic_axes.plot([index_min_date, index_max_date],[20,20], color='grey', linewidth=3, linestyle='--')
+    stochastic_axes.plot(df_prices[[TechnicalsDataColumns.COL_STOCHASTIC_K]], color='blue', linewidth=linewidth)
+    stochastic_axes.plot(df_prices[[TechnicalsDataColumns.COL_STOCHASTIC_D]], color='red', linewidth=linewidth)
+    stochastic_axes.plot([index_min_date, index_max_date],[80,80], color='grey', linewidth=linewidth, linestyle='--')
+    stochastic_axes.plot([index_min_date, index_max_date],[20,20], color='grey', linewidth=linewidth, linestyle='--')
     stochastic_axes.fill_between(df_prices.index, 20, 80, color='pink')
     stochastic_axes.set_title('{0} Stochastic'.format(instrument_description), {'fontweight':'bold'})
     plt.ylim(bottom=0, top=100)
 
     macd_axes = fig.add_subplot(313)
     macd_axes.set_title('{0} MACD'.format(instrument_description), {'fontweight':'bold'})
-    macd_axes.plot(df_prices[[TechnicalsDataColumns.COL_MACD]], color='blue', linewidth=3)
-    macd_axes.plot(df_prices[[TechnicalsDataColumns.COL_MACD_SIGNAL]],color='red', linewidth=3)
+    macd_axes.plot(df_prices[[TechnicalsDataColumns.COL_MACD]], color='blue', linewidth=linewidth)
+    macd_axes.plot(df_prices[[TechnicalsDataColumns.COL_MACD_SIGNAL]],color='red', linewidth=linewidth)
     macd_axes.bar(df_prices.index, df_prices[TechnicalsDataColumns.COL_MACD] - df_prices[TechnicalsDataColumns.COL_MACD_SIGNAL], color='red', width=0.5)
 
     plt.tight_layout()
