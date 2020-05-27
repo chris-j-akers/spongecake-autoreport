@@ -8,7 +8,7 @@ from spongecake.fundamentals import InvestorsChronicleInterface, IC_INCOME_DATA
 from spongecake.technicals import Indicators
 from spongecake.prices import YahooPricesInterface
 from data_columns import FundamentalsDataColumns, TechnicalsDataColumns
-from spongecake_pdf_generator import spongecake_pdf_generator
+from spongecake_report_generator import SpongecakeReportGenerator
 import html_formatting
 import emailer
 
@@ -111,12 +111,14 @@ def get_watchlist():
 
 
 def generate_pdf_report(watchlist):
+    # Set-up objects
     ypi = YahooPricesInterface()
     ic = InvestorsChronicleInterface()
     tmp_path = get_new_tmp_directory()
     date_str = dt.now().strftime('%Y_%m_%d')
-    report_email = emailer.email()
-    pdf_gen = spongecake_pdf_generator()
+    pdf_gen = SpongecakeReportGenerator()
+
+    # Build html
     html = ''
     for tidm in watchlist.keys():
         balance = ic.get_ic_balance_sheet(tidm)
@@ -130,16 +132,26 @@ def generate_pdf_report(watchlist):
             fig_filename = '{0}_{1}.png'.format(tidm, date_str)
             chart.savefig('{0}/{1}'.format(tmp_path, fig_filename))
             html += pdf_gen.generate_html('{0} - {1} ({2})'.format(tidm,watchlist[tidm], ic.get_current_ic_price(tidm)), 'file:///{0}/{1}'.format(tmp_path, fig_filename), income, balance, summary)
+    
+    # Send HTML to Weasyprint PDF generator
     report_full_path = '{0}/spongecake_{1}'.format(tmp_path, date_str)
     pdf_gen.generate_pdf(report_full_path, html)
-    return report_full_path
+
+    # Let caller know where it is
+    return report_full_path + '.pdf'
     
+
+def generate_email(watchlist):
+    report_path = generate_pdf_report(watchlist)
+    report_email = emailer.Email()
+    report_email.add_attachment(report_path)
+    return report_email    
 
 def build_email(watchlist):
     ypi = YahooPricesInterface()
     tmp_path = get_new_tmp_directory()
     date_str = dt.now().strftime('%Y_%m_%d')
-    report_email = emailer.email()
+    report_email = emailer.Email()
     mail_html = html_formatting.header()
     for tidm in watchlist.keys():
         mail_html += html_formatting.company_header('{0} ({1})'.format(watchlist[tidm], tidm))
@@ -162,10 +174,9 @@ def build_email(watchlist):
 
 def main():
     register_matplotlib_converters()
-    pdf_report = generate_pdf_report(get_watchlist())
-    # daily_email = build_email(get_watchlist())
+    daily_email = generate_email(get_watchlist())
     now_str = dt.now().strftime('%Y-%m-%d')
-    #daily_email.send('Technicals Report {0}'.format(now_str), recipients='chris.j.akers@gmail.com')
+    daily_email.send('Technicals Report {0}'.format(now_str), recipients='chris.j.akers@gmail.com')
 
 
 if __name__ == '__main__':

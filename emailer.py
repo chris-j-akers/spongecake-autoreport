@@ -6,6 +6,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.header import Header
+from email.mime.base import MIMEBase 
+from email import encoders 
 
 # ===============================================
 GMAIL_USER = os.getenv('GMAIL_USER')
@@ -14,7 +16,7 @@ GMAIL_PORT = 465
 GMAIL_SERVER = 'smtp.gmail.com'
 # ===============================================
 
-class email:
+class Email:
 
     def __init__(self):
         self.msg = MIMEMultipart('mixed')
@@ -38,3 +40,12 @@ class email:
         with smtplib.SMTP_SSL(GMAIL_SERVER, GMAIL_PORT, context=context) as mail_server:
             mail_server.login(GMAIL_USER, GMAIL_PASSWORD)
             mail_server.sendmail(GMAIL_USER, recipients, self.msg.as_string())
+
+    def add_attachment(self, attachment_path):
+        attachment = open(attachment_path, 'rb')
+        base = MIMEBase('application', 'octet-stream')
+        base.set_payload((attachment).read()) 
+        encoders.encode_base64(base) 
+        base.add_header('Content-Disposition', "attachment; filename= %s" % attachment_path) 
+        
+        self.msg.attach(base) 
