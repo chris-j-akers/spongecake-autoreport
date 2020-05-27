@@ -21,7 +21,7 @@ class SpongecakeReportGenerator:
                 border-collapse: collapse;
                 border: 1px solid gray;
                 margin: 2px;
-                font-size: 5px;
+                font-size: 7px;
                 display: inline-block;
                 vertical-align: top;
             }
@@ -31,7 +31,7 @@ class SpongecakeReportGenerator:
     def th_css(self):
         return CSS(string = '''
             th {
-                font-size: 5px;
+                font-size: 7px;
                 text-align: left;
                 font-weight: bold;
                 border: 1px solid gray;
@@ -43,7 +43,7 @@ class SpongecakeReportGenerator:
     def td_css(self):
         return CSS(string = '''
             td {
-                font-size: 5px;
+                font-size: 7px;
                 text-align: left;
                 border: 1px solid gray;
                 padding: 2px;
