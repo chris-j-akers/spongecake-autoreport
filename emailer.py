@@ -46,6 +46,6 @@ class Email:
         base = MIMEBase('application', 'octet-stream')
         base.set_payload((attachment).read()) 
         encoders.encode_base64(base) 
-        base.add_header('Content-Disposition', "attachment; filename= %s" % attachment_path) 
+        base.add_header('Content-Disposition', "attachment; filename={0}".format(os.path.basename(attachment_path)))
         
         self.msg.attach(base) 

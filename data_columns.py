@@ -5,23 +5,3 @@ class TechnicalsDataColumns:
     COL_STOCHASTIC_D = 'STO_D'
     COL_CLOSE = 'CLOSE'
     COL_VOLUME = 'Volume'
-
-
-class FundamentalsDataColumns:
-    COL_CURRENT_PRICE = 'Current Price'
-    COL_SHARES_OUTSTANDING = 'Shares Outstanding'
-    COL_MARKET_CAP = 'Market Cap'
-    COL_DATE_OF_LAST_BALANCE_SHEET = 'Date of Last Balance Sheet'
-    COL_DATE_OF_LATEST_INCOME_SHEET = 'Date of Latest Income Sheet'
-    COL_TOTAL_REVENUE = 'Total Revenue'
-    COL_NET_INCOME_AFTER_TAX = 'Net Income After Tax'
-    COL_CURRENT_RATIO = 'Current Ratio'
-    COL_TOTAL_DEBT = 'Total Debt'
-    COL_NAV_PER_SHARE_PCT_OF_PRICE = 'NAV Per Share as % of Price'
-    COL_EPS = 'EPS'
-    COL_EPS_TTM = 'EPS (TTM)'
-    COL_PE_RATIO = 'P/E Ratio'
-    COL_PE_RATIO_TTM = 'P/E Ratio (TTM)'
-    COL_EARNINGS_YIELD_PERCENT = 'Earnings Yield %'
-    COL_EARNINGS_YIELD_PERCENT_TTM = 'Earnings Yield % (TTM)'
-    COL_ROCE = 'ROCE'
