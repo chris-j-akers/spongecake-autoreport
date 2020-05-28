@@ -141,9 +141,6 @@ class SpongecakeReportGenerator:
                             {income_table}
                             {balance_table}
                         </div>
-                        <p/>
-                        <hr>
-                        </p>
                     </div>
                 <body>
             </html>
