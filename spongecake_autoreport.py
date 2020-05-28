@@ -1,6 +1,7 @@
 from datetime import datetime as dt, timedelta
 import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters	
+import pandas as pd
 import uuid
 import os
 # My stuff
@@ -64,6 +65,19 @@ def get_technical_data_for_instrument(tidm, market='L', number_of_days=180):
     prices_df = prices_df[prices_df.index > cut_off_date.strftime("%Y-%m-%d")]
     return prices_df
 
+def build_calcs_table(tidm):
+    ic = InvestorsChronicleInterface()
+    df = pd.DataFrame(columns=['CALC LINE ITEM', 'VALUE'])
+    rows = [
+            {'CALC LINE ITEM': 'CURRENT RATIO', 'VALUE': ic.get_current_ratio(tidm)},
+            {'CALC LINE ITEM': 'ROCE', 'VALUE': ic.get_roce_pct(tidm)},
+            {'CALC LINE ITEM': 'EARNINGS YIELD % (TTM)', 'VALUE': ic.get_earnings_yield_pct_ttm(tidm)},
+            {'CALC LINE ITEM': 'NAV (£m)', 'VALUE': ic.get_nav(tidm)},
+            {'CALC LINE ITEM': 'NAV PER SHARE (£)', 'VALUE': ic.get_nav_per_share(tidm)},
+            {'CALC LINE ITEM': 'NAV PER SHARE AS % OF PRICE', 'VALUE': ic.get_nav_per_share_as_pct_of_price(tidm)},           
+    ]
+    df = df.append(rows, ignore_index=True)
+    return df
 
 def get_new_tmp_directory(tmp_location='/tmp'):
     '''
@@ -88,7 +102,6 @@ def get_watchlist():
             watchlist[tidm.rstrip().lstrip()] = company.rstrip().lstrip()
     return watchlist
 
-
 def generate_pdf_report(watchlist):
     '''
     Generate a report that consists of Technical Charts, Income, Balance and Summary sheets using the Spongecake-Financials package
@@ -106,6 +119,7 @@ def generate_pdf_report(watchlist):
         balance = ic.get_ic_balance_sheet(tidm)
         income = ic.get_ic_income_sheet(tidm)
         summary = ic.get_ic_summary_sheet(tidm)
+        calcs = build_calcs_table(tidm)
         df_prices = ypi.get_yahoo_prices('{0}'.format(tidm))
         if len(df_prices) >0:
             Indicators.set_macd(df_prices)
@@ -113,7 +127,7 @@ def generate_pdf_report(watchlist):
             chart = get_technicals_chart_for_instrument(df_prices, '{0} ({1})'.format(watchlist[tidm], tidm))
             fig_filename = '{0}_{1}.png'.format(tidm, date_str)
             chart.savefig('{0}/{1}'.format(tmp_path, fig_filename))
-            html += pdf_gen.generate_html('{0} - {1} ({2})'.format(tidm,watchlist[tidm], ic.get_current_ic_price(tidm)), 'file:///{0}/{1}'.format(tmp_path, fig_filename), income, balance, summary)
+            html += pdf_gen.generate_html('{0} - {1} ({2})'.format(tidm,watchlist[tidm], ic.get_current_ic_price(tidm)), 'file:///{0}/{1}'.format(tmp_path, fig_filename), income, balance, summary, calcs)
     
     # Send HTML to Weasyprint PDF generator
     report_full_path = '{0}/spongecake_{1}'.format(tmp_path, date_str)

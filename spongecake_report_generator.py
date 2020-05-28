@@ -106,7 +106,7 @@ class SpongecakeReportGenerator:
             }
         ''')
 
-    def html_template(self, title, income_html_table, balance_html_table, summary_html_table, chart_img_path):
+    def html_template(self, title, income_html_table, balance_html_table, summary_html_table, calcs_table, chart_img_path):
         return '''
             <html>
                 <head>
@@ -123,20 +123,38 @@ class SpongecakeReportGenerator:
                         <hr>
                         <p/>
                         <div class="table_block">
-                            {summary_table}
+                            <table style="border-collapse: collapse; border: none; margin: 0px;">
+                                <tr>
+                                    <td style="border: none; padding: 0px";>
+                                        {summary_table}
+                                        <p/>
+                                        <hr>
+                                        <p/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 0px">
+                                        {calcs_table}
+                                    </td>
+                                </tr>
+                            </table>
                             {income_table}
                             {balance_table}
                         </div>
+                        <p/>
+                        <hr>
+                        </p>
                     </div>
                 <body>
             </html>
             '''.format(income_table = income_html_table,
                     balance_table = balance_html_table,
                     summary_table = summary_html_table,
+                    calcs_table = calcs_table,
                     chart_img_path = chart_img_path,
                     title=title)
 
-    def generate_html(self, title, chart_img_filename, income_table, balance_table, summary_table):
+    def generate_html(self, title, chart_img_filename, income_table, balance_table, summary_table, calcs_table):
 
         income_table = income_table.reset_index()
         income_table['Income Line Item'] = income_table['Income Line Item'].str.upper()
@@ -153,8 +171,9 @@ class SpongecakeReportGenerator:
         income_table_html = income_table.to_html(index=False)
         balance_table_html = balance_table.to_html(index=False)
         summary_table_html = summary_table.to_html(index=False)
+        calcs_table_html = calcs_table.to_html(index=False)
 
-        raw_html = self.html_template(title, income_table_html, balance_table_html, summary_table_html, chart_img_filename)
+        raw_html = self.html_template(title, income_table_html, balance_table_html, summary_table_html, calcs_table_html, chart_img_filename)
         return raw_html
 
     def generate_pdf(self, path, raw_html):
