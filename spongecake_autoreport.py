@@ -50,20 +50,48 @@ def get_technicals_chart_for_instrument(df_prices,
     plt.tight_layout()
     return fig
 
+def santise_prices(tidm, df_prices):
 
-def get_technical_data_for_instrument(tidm, market='L', number_of_days=180):
-    '''
-    Download prices data from yahoo and set the MACD/Stochastic Oscillator.
-    
-    Chops data off at 180 days (~6 months by default)
-    '''
-    ypi = YahooPricesInterface()
-    prices_df = ypi.get_yahoo_prices('tidm.{0}'.format(market))
-    Indicators.set_macd(prices_df)
-    Indicators.set_stochastic_oscillator(prices_df)
-    cut_off_date = dt.today() - timedelta(days=180)
-    prices_df = prices_df[prices_df.index > cut_off_date.strftime("%Y-%m-%d")]
-    return prices_df
+    # Yahoo isn't perfect (but it's free!) and, occasionally we'll have to 
+    # 'manually' modify some of their shit. We take the tidm as a parameter
+    # because it may just be some prices that are affected. Or could just pay
+    # for a reliable feed at some point.
+
+    #   1. 20 June 2020
+    #   Some prices for instruments are clearly put in GBP instead of GBX so have
+    #   to * by 100 until we're out of the window (6 months at time of writing)
+
+    df_prices.loc['2020-06-30']['HIGH'] = df_prices.loc['2020-06-30']['HIGH'] * 100
+    df_prices.loc['2020-06-30']['LOW'] = df_prices.loc['2020-06-30']['LOW'] * 100
+    df_prices.loc['2020-06-30']['OPEN'] = df_prices.loc['2020-06-30']['OPEN'] * 100
+    df_prices.loc['2020-06-30']['CLOSE'] = df_prices.loc['2020-06-30']['CLOSE'] * 100
+    df_prices.loc['2020-06-30']['ADJ CLOSE'] = df_prices.loc['2020-06-30']['ADJ CLOSE'] * 100
+
+    #   2. 02 July 2020 for some tidms
+    if tidm in ['CDM','FDEV', 'KWS', 'TM17', 'EMIS', 'SCT','SPX','KNOS', 'PAY', 'IOM','TUNE','ZOO']:
+        df_prices.loc['2020-07-02']['HIGH'] = df_prices.loc['2020-07-02']['HIGH'] * 100
+        df_prices.loc['2020-07-02']['LOW'] = df_prices.loc['2020-07-02']['LOW'] * 100
+        df_prices.loc['2020-07-02']['OPEN'] = df_prices.loc['2020-07-02']['OPEN'] * 100
+        df_prices.loc['2020-07-02']['CLOSE'] = df_prices.loc['2020-07-02']['CLOSE'] * 100
+        df_prices.loc['2020-07-02']['ADJ CLOSE'] = df_prices.loc['2020-07-02']['ADJ CLOSE'] * 100
+       
+    #   3. 29 June 2020
+    if tidm in ['KWS','KNOS']:
+        df_prices.loc['2020-06-29']['HIGH'] = df_prices.loc['2020-06-29']['HIGH'] * 100
+        df_prices.loc['2020-06-29']['LOW'] = df_prices.loc['2020-06-29']['LOW'] * 100
+        df_prices.loc['2020-06-29']['OPEN'] = df_prices.loc['2020-06-29']['OPEN'] * 100
+        df_prices.loc['2020-06-29']['CLOSE'] = df_prices.loc['2020-06-29']['CLOSE'] * 100
+        df_prices.loc['2020-06-29']['ADJ CLOSE'] = df_prices.loc['2020-06-29']['ADJ CLOSE'] * 100
+
+    #   4. 6 July 2020 for Sparx
+    if tidm in ['SPX']:
+        df_prices.loc['2020-07-06']['HIGH'] = df_prices.loc['2020-07-06']['HIGH'] * 100
+        df_prices.loc['2020-07-06']['LOW'] = df_prices.loc['2020-07-06']['LOW'] * 100
+        df_prices.loc['2020-07-06']['OPEN'] = df_prices.loc['2020-07-06']['OPEN'] * 100
+        df_prices.loc['2020-07-06']['CLOSE'] = df_prices.loc['2020-07-06']['CLOSE'] * 100
+        df_prices.loc['2020-07-06']['ADJ CLOSE'] = df_prices.loc['2020-07-06']['ADJ CLOSE'] * 100
+
+    return df_prices
 
 def build_calcs_table(tidm):
     ic = InvestorsChronicleInterface()
@@ -116,12 +144,14 @@ def generate_pdf_report(watchlist):
     # Build html
     html = ''
     for tidm in watchlist.keys():
+        print("Getting data for TIDM {0}".format(tidm))
         balance = ic.get_ic_balance_sheet(tidm)
         income = ic.get_ic_income_sheet(tidm)
         summary = ic.get_ic_summary_sheet(tidm)
         calcs = build_calcs_table(tidm)
         df_prices = ypi.get_yahoo_prices('{0}'.format(tidm))
         if len(df_prices) >0:
+            df_prices = santise_prices(tidm, df_prices)
             Indicators.set_macd(df_prices)
             Indicators.set_stochastic_oscillator(df_prices)
             chart = get_technicals_chart_for_instrument(df_prices, '{0} ({1})'.format(watchlist[tidm], tidm))
