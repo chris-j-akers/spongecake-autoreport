@@ -10,6 +10,7 @@ from spongecake.technicals import Indicators
 from spongecake.prices import YahooPricesInterface
 from data_columns import TechnicalsDataColumns
 from spongecake_report_generator import SpongecakeReportGenerator
+from company import Company
 import emailer
 
 
@@ -61,35 +62,37 @@ def santise_prices(tidm, df_prices):
     #   Some prices for instruments are clearly put in GBP instead of GBX so have
     #   to * by 100 until we're out of the window (6 months at time of writing)
 
-    df_prices.loc['2020-06-30']['HIGH'] = df_prices.loc['2020-06-30']['HIGH'] * 100
-    df_prices.loc['2020-06-30']['LOW'] = df_prices.loc['2020-06-30']['LOW'] * 100
-    df_prices.loc['2020-06-30']['OPEN'] = df_prices.loc['2020-06-30']['OPEN'] * 100
-    df_prices.loc['2020-06-30']['CLOSE'] = df_prices.loc['2020-06-30']['CLOSE'] * 100
-    df_prices.loc['2020-06-30']['ADJ CLOSE'] = df_prices.loc['2020-06-30']['ADJ CLOSE'] * 100
+    # And they corrected their data, so removed all this on 2020-09-01
 
-    #   2. 02 July 2020 for some tidms
-    if tidm in ['CDM','FDEV', 'KWS', 'TM17', 'EMIS', 'SCT','SPX','KNOS', 'PAY', 'IOM','TUNE','ZOO']:
-        df_prices.loc['2020-07-02']['HIGH'] = df_prices.loc['2020-07-02']['HIGH'] * 100
-        df_prices.loc['2020-07-02']['LOW'] = df_prices.loc['2020-07-02']['LOW'] * 100
-        df_prices.loc['2020-07-02']['OPEN'] = df_prices.loc['2020-07-02']['OPEN'] * 100
-        df_prices.loc['2020-07-02']['CLOSE'] = df_prices.loc['2020-07-02']['CLOSE'] * 100
-        df_prices.loc['2020-07-02']['ADJ CLOSE'] = df_prices.loc['2020-07-02']['ADJ CLOSE'] * 100
+    # df_prices.loc['2020-06-30']['HIGH'] = df_prices.loc['2020-06-30']['HIGH'] * 100
+    # df_prices.loc['2020-06-30']['LOW'] = df_prices.loc['2020-06-30']['LOW'] * 100
+    # df_prices.loc['2020-06-30']['OPEN'] = df_prices.loc['2020-06-30']['OPEN'] * 100
+    # df_prices.loc['2020-06-30']['CLOSE'] = df_prices.loc['2020-06-30']['CLOSE'] * 100
+    # df_prices.loc['2020-06-30']['ADJ CLOSE'] = df_prices.loc['2020-06-30']['ADJ CLOSE'] * 100
+
+    # #   2. 02 July 2020 for some tidms
+    # if tidm in ['CDM','FDEV', 'KWS', 'TM17', 'EMIS', 'SCT','SPX','KNOS', 'PAY', 'IOM','TUNE','ZOO']:
+    #     df_prices.loc['2020-07-02']['HIGH'] = df_prices.loc['2020-07-02']['HIGH'] * 100
+    #     df_prices.loc['2020-07-02']['LOW'] = df_prices.loc['2020-07-02']['LOW'] * 100
+    #     df_prices.loc['2020-07-02']['OPEN'] = df_prices.loc['2020-07-02']['OPEN'] * 100
+    #     df_prices.loc['2020-07-02']['CLOSE'] = df_prices.loc['2020-07-02']['CLOSE'] * 100
+    #     df_prices.loc['2020-07-02']['ADJ CLOSE'] = df_prices.loc['2020-07-02']['ADJ CLOSE'] * 100
        
-    #   3. 29 June 2020
-    if tidm in ['KWS','KNOS']:
-        df_prices.loc['2020-06-29']['HIGH'] = df_prices.loc['2020-06-29']['HIGH'] * 100
-        df_prices.loc['2020-06-29']['LOW'] = df_prices.loc['2020-06-29']['LOW'] * 100
-        df_prices.loc['2020-06-29']['OPEN'] = df_prices.loc['2020-06-29']['OPEN'] * 100
-        df_prices.loc['2020-06-29']['CLOSE'] = df_prices.loc['2020-06-29']['CLOSE'] * 100
-        df_prices.loc['2020-06-29']['ADJ CLOSE'] = df_prices.loc['2020-06-29']['ADJ CLOSE'] * 100
+    # #   3. 29 June 2020
+    # if tidm in ['KWS','KNOS']:
+    #     df_prices.loc['2020-06-29']['HIGH'] = df_prices.loc['2020-06-29']['HIGH'] * 100
+    #     df_prices.loc['2020-06-29']['LOW'] = df_prices.loc['2020-06-29']['LOW'] * 100
+    #     df_prices.loc['2020-06-29']['OPEN'] = df_prices.loc['2020-06-29']['OPEN'] * 100
+    #     df_prices.loc['2020-06-29']['CLOSE'] = df_prices.loc['2020-06-29']['CLOSE'] * 100
+    #     df_prices.loc['2020-06-29']['ADJ CLOSE'] = df_prices.loc['2020-06-29']['ADJ CLOSE'] * 100
 
-    #   4. 6 July 2020 for Sparx
-    if tidm in ['SPX']:
-        df_prices.loc['2020-07-06']['HIGH'] = df_prices.loc['2020-07-06']['HIGH'] * 100
-        df_prices.loc['2020-07-06']['LOW'] = df_prices.loc['2020-07-06']['LOW'] * 100
-        df_prices.loc['2020-07-06']['OPEN'] = df_prices.loc['2020-07-06']['OPEN'] * 100
-        df_prices.loc['2020-07-06']['CLOSE'] = df_prices.loc['2020-07-06']['CLOSE'] * 100
-        df_prices.loc['2020-07-06']['ADJ CLOSE'] = df_prices.loc['2020-07-06']['ADJ CLOSE'] * 100
+    # #   4. 6 July 2020 for Sparx
+    # if tidm in ['SPX']:
+    #     df_prices.loc['2020-07-06']['HIGH'] = df_prices.loc['2020-07-06']['HIGH'] * 100
+    #     df_prices.loc['2020-07-06']['LOW'] = df_prices.loc['2020-07-06']['LOW'] * 100
+    #     df_prices.loc['2020-07-06']['OPEN'] = df_prices.loc['2020-07-06']['OPEN'] * 100
+    #     df_prices.loc['2020-07-06']['CLOSE'] = df_prices.loc['2020-07-06']['CLOSE'] * 100
+    #     df_prices.loc['2020-07-06']['ADJ CLOSE'] = df_prices.loc['2020-07-06']['ADJ CLOSE'] * 100
 
     return df_prices
 
@@ -119,15 +122,18 @@ def get_new_tmp_directory(tmp_location='/tmp'):
 
 def get_watchlist():
     '''
-    Return list of TIDMs and Company Names from the watchlist configuration file
+    Return list of Company objects (TIDMs, Descrptions and Company Names) from the watchlist configuration file
     '''
     watchlist = {}
     watchlist_file = open('watchlist','r')
     lines = watchlist_file.readlines()
     for line in lines:
         if line[0] != '#':
-            tidm,company = line.split(',')
-            watchlist[tidm.rstrip().lstrip()] = company.rstrip().lstrip()
+            tidm,name,description = line.split('|')
+            tidm = tidm.rstrip().lstrip()
+            name = name.rstrip().lstrip()
+            description = description.rstrip().lstrip()
+            watchlist[tidm] = Company(tidm, name, description)
     return watchlist
 
 def generate_pdf_report(watchlist):
@@ -154,10 +160,10 @@ def generate_pdf_report(watchlist):
             df_prices = santise_prices(tidm, df_prices)
             Indicators.set_macd(df_prices)
             Indicators.set_stochastic_oscillator(df_prices)
-            chart = get_technicals_chart_for_instrument(df_prices, '{0} ({1})'.format(watchlist[tidm], tidm))
+            chart = get_technicals_chart_for_instrument(df_prices, '{0} ({1})'.format(watchlist[tidm].tidm, watchlist[tidm].name))
             fig_filename = '{0}_{1}.png'.format(tidm, date_str)
             chart.savefig('{0}/{1}'.format(tmp_path, fig_filename))
-            html += pdf_gen.generate_html('{0} - {1} ({2})'.format(tidm,watchlist[tidm], ic.get_current_ic_price(tidm)), 'file:///{0}/{1}'.format(tmp_path, fig_filename), income, balance, summary, calcs)
+            html += pdf_gen.generate_html('{0} - {1} ({2})'.format(tidm,watchlist[tidm].name, ic.get_current_ic_price(tidm)), watchlist[tidm].description, 'file:///{0}/{1}'.format(tmp_path, fig_filename), income, balance, summary, calcs)
     
     # Send HTML to Weasyprint PDF generator
     report_full_path = '{0}/spongecake_{1}'.format(tmp_path, date_str)

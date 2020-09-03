@@ -106,7 +106,15 @@ class SpongecakeReportGenerator:
             }
         ''')
 
-    def html_template(self, title, income_html_table, balance_html_table, summary_html_table, calcs_table, chart_img_path):
+    def company_description_css(self):
+        return CSS(string = '''
+            .company_description {
+                font-size: 10px;
+                font-style: italic;
+            }
+        ''')
+
+    def html_template(self, title, description, income_html_table, balance_html_table, summary_html_table, calcs_table, chart_img_path):
         return '''
             <html>
                 <head>
@@ -115,6 +123,17 @@ class SpongecakeReportGenerator:
                     <div>
                         <h3>{title}</h3>
                     </div>
+                    </p>
+                        <hr>
+                    </p>
+                    <div class="company_description">
+                        <p>
+                            {company_description}
+                        </p>
+                    </div>
+                    </p>
+                    <hr>
+                    </p>
                     <div class="company_block">
                         <div>
                             <img src='{chart_img_path}'/>
@@ -149,9 +168,10 @@ class SpongecakeReportGenerator:
                     summary_table = summary_html_table,
                     calcs_table = calcs_table,
                     chart_img_path = chart_img_path,
-                    title=title)
+                    title=title,
+                    company_description=description)
 
-    def generate_html(self, title, chart_img_filename, income_table, balance_table, summary_table, calcs_table):
+    def generate_html(self, title, description, chart_img_filename, income_table, balance_table, summary_table, calcs_table):
 
         income_table = income_table.reset_index()
         income_table['Income Line Item'] = income_table['Income Line Item'].str.upper()
@@ -170,7 +190,7 @@ class SpongecakeReportGenerator:
         summary_table_html = summary_table.to_html(index=False)
         calcs_table_html = calcs_table.to_html(index=False)
 
-        raw_html = self.html_template(title, income_table_html, balance_table_html, summary_table_html, calcs_table_html, chart_img_filename)
+        raw_html = self.html_template(title, description, income_table_html, balance_table_html, summary_table_html, calcs_table_html, chart_img_filename)
         return raw_html
 
     def generate_pdf(self, path, raw_html):
@@ -184,7 +204,8 @@ class SpongecakeReportGenerator:
                                                                             self.td_css(), 
                                                                             self.th_css(),
                                                                             self.body_css(),
-                                                                            self.company_block_css()],
+                                                                            self.company_block_css(),
+                                                                            self.company_description_css()],
                                                                             font_config=font_config)
 
 
