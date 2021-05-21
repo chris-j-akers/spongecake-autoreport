@@ -90,13 +90,15 @@ Spongecake Autoreport can be run as a container without having to configure your
 
 To build the relevant Docker image run the following from the repo directory.
 
-`docker image build .`
+`docker image build -t spongecake-autoreport .`
 
-Note the Dockerfile configures the output location (`/tmp` by default) to the current host's `/tmp`. This should be changed in the Dockerfile if it isn't convenient.
+Spongecake-autoreport, by default, outputs reports to the `/tmp` directory. The Dockerfile configures a `/tmp` volume which must be mapped to a directory on the host using the `-v` switch when running. If not, the report will be inaccessible.
 
-To generate the report, run:
+To generate the report, and output to the hosts `/tmp` directory, run:
 
-`docker container run spongecake-autoreport`
+`docker container run -v /tmp:/tmp spongecake-autoreport`
+
+The output will be similar to the above, except Docker doesn't flush `stdout` immediately, so it may take a while before the text is displayed.
 
 ## Appendix A - `emailer.py`
 
