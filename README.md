@@ -86,9 +86,9 @@ Report generated at: /tmp/0a3dd596-baf9-40e4-a60f-df7c96584d56_scautoreport/spon
 ```
 ## Running as a Docker Container
 
-Spongecake Autoreport can be run as a container without having to configure your environment.
+Spongecake Autoreport can be run as a container without having to configure your environment as long as Docker is installed.
 
-To build the relevant Docker image run the following from the repo directory.
+First, the Docker image needs to be built. Run the following from the repo directory:
 
 `docker image build -t spongecake-autoreport .`
 
