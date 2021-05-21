@@ -11,7 +11,7 @@ from spongecake.prices import YahooPricesInterface
 from data_columns import TechnicalsDataColumns
 from spongecake_report_generator import SpongecakeReportGenerator
 from company import Company
-import emailer
+
 
 
 def get_technicals_chart_for_instrument(df_prices, 
@@ -19,7 +19,24 @@ def get_technicals_chart_for_instrument(df_prices,
                                         figsize=(25,6),
                                         linewidth=3):
     '''
-    Returns a 3 chart Matplotlib figure of Close & Vol, Stochastic Oscillator and MACD.
+    Produce 3-chart matplotlib figure from a list of dates and prices for a
+    particular instrument.
+
+    Parameters: 
+
+        df_prices: A dataframe consisting of dates and prices for a particular instrument
+        instrument_descrription: Plain text description of the instrument
+        figsize: Size of the final figure to be returned
+        linewidth: Line width to use for the charts
+
+    Returns:
+
+        A Matplotlib figure consisting of 3 charts (from top to bottom):
+
+            * Closing Period Price and Volume Chart
+            * Stochastic Oscillator Chart
+            * MACD Chart
+
     '''
     index_min_date = min(df_prices.index)
     index_max_date = max(df_prices.index)
@@ -53,50 +70,54 @@ def get_technicals_chart_for_instrument(df_prices,
 
 def santise_prices(tidm, df_prices):
 
-    # Yahoo isn't perfect (but it's free!) and, occasionally we'll have to 
-    # 'manually' modify some of their shit. We take the tidm as a parameter
-    # because it may just be some prices that are affected. Or could just pay
-    # for a reliable feed at some point.
+    '''
+    Spongecake-Autoreport is built around Yahoo prices which are free, but
+    aren't perfect. Occasionally there will be anomalies and these will need to
+    be fixed or smoothed over until Yahoo themselves get around to it.
 
-    #   1. 20 June 2020
-    #   Some prices for instruments are clearly put in GBP instead of GBX so have
-    #   to * by 100 until we're out of the window (6 months at time of writing)
+    This function is called when generating the report and logic can be added
+    to adjust prices where necessary.
 
-    # And they corrected their data, so removed all this on 2020-09-01
+    If this function is empty, then that means prices are all good!
 
-    # df_prices.loc['2020-06-30']['HIGH'] = df_prices.loc['2020-06-30']['HIGH'] * 100
-    # df_prices.loc['2020-06-30']['LOW'] = df_prices.loc['2020-06-30']['LOW'] * 100
-    # df_prices.loc['2020-06-30']['OPEN'] = df_prices.loc['2020-06-30']['OPEN'] * 100
-    # df_prices.loc['2020-06-30']['CLOSE'] = df_prices.loc['2020-06-30']['CLOSE'] * 100
-    # df_prices.loc['2020-06-30']['ADJ CLOSE'] = df_prices.loc['2020-06-30']['ADJ CLOSE'] * 100
+    Parameters:
 
-    # #   2. 02 July 2020 for some tidms
-    # if tidm in ['CDM','FDEV', 'KWS', 'TM17', 'EMIS', 'SCT','SPX','KNOS', 'PAY', 'IOM','TUNE','ZOO']:
-    #     df_prices.loc['2020-07-02']['HIGH'] = df_prices.loc['2020-07-02']['HIGH'] * 100
-    #     df_prices.loc['2020-07-02']['LOW'] = df_prices.loc['2020-07-02']['LOW'] * 100
-    #     df_prices.loc['2020-07-02']['OPEN'] = df_prices.loc['2020-07-02']['OPEN'] * 100
-    #     df_prices.loc['2020-07-02']['CLOSE'] = df_prices.loc['2020-07-02']['CLOSE'] * 100
-    #     df_prices.loc['2020-07-02']['ADJ CLOSE'] = df_prices.loc['2020-07-02']['ADJ CLOSE'] * 100
-       
-    # #   3. 29 June 2020
-    # if tidm in ['KWS','KNOS']:
-    #     df_prices.loc['2020-06-29']['HIGH'] = df_prices.loc['2020-06-29']['HIGH'] * 100
-    #     df_prices.loc['2020-06-29']['LOW'] = df_prices.loc['2020-06-29']['LOW'] * 100
-    #     df_prices.loc['2020-06-29']['OPEN'] = df_prices.loc['2020-06-29']['OPEN'] * 100
-    #     df_prices.loc['2020-06-29']['CLOSE'] = df_prices.loc['2020-06-29']['CLOSE'] * 100
-    #     df_prices.loc['2020-06-29']['ADJ CLOSE'] = df_prices.loc['2020-06-29']['ADJ CLOSE'] * 100
+        tidm: The tidm (mnemonic) of the affected instrument
+        df_prices: A Dataframe of dates and prices for the affected instrument
 
-    # #   4. 6 July 2020 for Sparx
-    # if tidm in ['SPX']:
-    #     df_prices.loc['2020-07-06']['HIGH'] = df_prices.loc['2020-07-06']['HIGH'] * 100
-    #     df_prices.loc['2020-07-06']['LOW'] = df_prices.loc['2020-07-06']['LOW'] * 100
-    #     df_prices.loc['2020-07-06']['OPEN'] = df_prices.loc['2020-07-06']['OPEN'] * 100
-    #     df_prices.loc['2020-07-06']['CLOSE'] = df_prices.loc['2020-07-06']['CLOSE'] * 100
-    #     df_prices.loc['2020-07-06']['ADJ CLOSE'] = df_prices.loc['2020-07-06']['ADJ CLOSE'] * 100
+    Returns:
+
+        An adjusted Dataframe with smoothed over or corrected prices
+    '''
+
+    # If there's no code, here, then that's good!
 
     return df_prices
 
 def build_calcs_table(tidm):
+    '''
+    Uses the InvestorsChronicleInterface of Spongecake-Financials to build a
+    Dataframe of fundamental calculations that can be printed out on each sheet
+    along with the charts and other fundamental data.
+
+    Calculations added are:
+
+        * CURRENT RATIO
+        * ROCE (return on capital employed)
+        * EARNINGS YIELD % (TTM)
+        * NAV (£m)
+        * NAV PER SHARE (£)
+        * NAV PER SHARE AS % OF PRICE
+
+    Parameters:
+
+        tidm: The tidm (mnemonic) of the instrument
+
+    Returns:
+
+        A new Dataframe with the above fundamental calculations
+
+    '''
     ic = InvestorsChronicleInterface()
     df = pd.DataFrame(columns=['CALC LINE ITEM', 'VALUE'])
     rows = [
@@ -112,7 +133,17 @@ def build_calcs_table(tidm):
 
 def get_new_tmp_directory(tmp_location='/tmp'):
     '''
-    Create a new temporary directory using a new UUID (default base is /tmp)
+    Create a temporary directory using a new UUID.
+
+    The directory name takes the format: {GUID}_scautoreport
+
+    Parameters:
+
+        tmp_location: The location to create the temporary directory (default = /tmp)
+        
+    Returns:
+
+        The full path of the new directory
     '''
     dir_uuid = uuid.uuid4()
     path = '{0}/{1}_scautoreport'.format(tmp_location, dir_uuid)
@@ -122,7 +153,12 @@ def get_new_tmp_directory(tmp_location='/tmp'):
 
 def get_watchlist():
     '''
-    Return list of Company objects (TIDMs, Descrptions and Company Names) from the watchlist configuration file
+    Collect and return a list of Spongecake Financials Company objects (TIDMs,
+    Descrptions and Company Names) based on the watchlist configuration file.
+
+    Returns:
+
+        A list of Spongecake Financials Company objects
     '''
     watchlist = {}
     watchlist_file = open('watchlist','r')
@@ -138,7 +174,16 @@ def get_watchlist():
 
 def generate_pdf_report(watchlist):
     '''
-    Generate a report that consists of Technical Charts, Income, Balance and Summary sheets using the Spongecake-Financials package
+    Generate the report in PDF format. The report consists of Technical Charts,
+    Income, Balance and Summary sheets using the Spongecake-Financials package.
+
+    Parameters:
+
+        watchlist: A list of Spongecake-Financials Company objects
+
+    Returns:
+
+        Full path and filename of the PDF report
     '''
     # Set-up objects
     ypi = YahooPricesInterface()
@@ -172,23 +217,18 @@ def generate_pdf_report(watchlist):
     # Let caller know where it is
     return report_full_path + '.pdf'
     
-
-def generate_email(watchlist):
-    '''
-    Produce email with report attached ready to send
-    '''
-    report_path = generate_pdf_report(watchlist)
-    report_email = emailer.Email()
-    report_email.add_attachment(report_path)
-    return report_email    
-
 def main():
-    # Have to do this, now, for Matplotlib charts or you get a deprecation warning
+    '''
+    Entry point. Generate the report and print out it's location.
+    '''
+    # Have to do this, now, for Matplotlib charts or there will be a deprecation
+    # warning
     register_matplotlib_converters()
 
-    daily_email = generate_email(get_watchlist())
-    now_str = dt.now().strftime('%Y-%m-%d')
-    daily_email.send('Technicals Report {0}'.format(now_str), recipients='chris.j.akers@gmail.com')
+
+    report_path = generate_pdf_report(get_watchlist())
+    print("Report generated at: {0}".format(report_path))
+
 
 if __name__ == '__main__':
     main()

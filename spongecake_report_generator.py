@@ -3,6 +3,13 @@ from weasyprint.fonts import FontConfiguration
 
 
 class SpongecakeReportGenerator:
+
+    '''
+    Class used to generate HTML for the Report.
+
+    Contains various HTML and CSS formatting functions and functions to generate
+    the complete HTML and PDF files using Weasyprint.
+    '''
     
     font_family = 'Noto Sans'
     font_url = 'https://fonts.googleapis.com/css?family=Noto+Sans'
@@ -172,6 +179,24 @@ class SpongecakeReportGenerator:
                     company_description=description)
 
     def generate_html(self, title, description, chart_img_filename, income_table, balance_table, summary_table, calcs_table):
+        '''
+        Produce full page of HTML consisting of company charts and other
+        statistics ready for conversion to PDF.
+
+        Parameters:
+
+            title: Page Title
+            description: Description of the instrument
+            chart_img_filename: Full path to the location of the chart image
+            income_table: Dataframe containing income data
+            balance_table: Dataframe containing balance data
+            summary_table: Dataframe containing summary data
+            calcs_table: Dataframe containing  various extra calculations
+
+        Returns
+
+            String of HTML formatted data for this particular report page
+        '''
 
         income_table = income_table.reset_index()
         income_table['Income Line Item'] = income_table['Income Line Item'].str.upper()
@@ -194,6 +219,15 @@ class SpongecakeReportGenerator:
         return raw_html
 
     def generate_pdf(self, path, raw_html):
+
+        '''
+        Generate PDF file from raw_html using Weasyprint.
+
+        Parameters:
+
+            path: Where to save the output PDF file
+            raw_html: String of HTML to convert
+        '''
 
         font_config = FontConfiguration()
         HTML(string=raw_html).write_pdf('{0}.pdf'.format(path),stylesheets=[self.font_css(), 
