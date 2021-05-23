@@ -57,21 +57,13 @@ RUN pip install ./dist/spongecake-1.0-py3-none-any.whl
 WORKDIR /usr/src/spongecake/
 RUN git clone https://github.com/chris-j-akers/spongecake-autoreport.git
 
-# Finally run the report
+# Copy the local version of the 'watchlist' configuration file over
+COPY ./watchlist /usr/src/spongecake/spongecake-autoreport/
 
+# Finally run the report
 WORKDIR /usr/src/spongecake/spongecake-autoreport/
 CMD ["python3","spongecake_autoreport.py"]
 
 # All reports are written to /tmp by default. If this is changed in the code,
-# then the volume will need to be changed, here.
-#
-# Obviously, when running the container, the -v parameter must be specified so
-# that the final report is accessible on the host.
-#
-# e.g. 
-#
-# docker container run -v /tmp:/tmp spongecake-autoreport
-#
-# ^^^ This will drop the report in the host's /tmp dir
-
+# then the volume will need to be changed here, too.
 VOLUME /tmp

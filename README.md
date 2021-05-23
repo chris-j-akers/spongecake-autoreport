@@ -88,9 +88,13 @@ Report generated at: /tmp/0a3dd596-baf9-40e4-a60f-df7c96584d56_scautoreport/spon
 ```
 ## Running as a Docker Container
 
-Spongecake Autoreport can be run as a container. This means you don't have to install all the required libraries on your own environment.
+Spongecake Autoreport can be run as a container so you don't have to download and configure all the required libraries on your own host.
 
-First, the Docker image needs to be built, so run the following from the repo directory:
+At the moment, one limitation is that if you change the 'watchlist' config file you need to rebuild the image. The step which copies the 'watchlist' file over is one of the last steps in the Docker file, though, so it doesn't actually take that long to rebuild. This could obviously be fixed at some point with a volume attached to the repo directory.
+
+The image is also quite large (800MB) as the libraries used have a lot of dependencies and it uses the Canonical Ubuntu image.
+
+To build the Docker image run the following from the repo directory:
 
 `docker image build -t spongecake-autoreport .`
 
