@@ -33,7 +33,7 @@ RUN pip install pandas \
 && pip install requests \
 && pip install pandas_datareader
 
-# Python packages required by WeasyPrint
+# Libs required by WeasyPrint
 
 RUN apt-get install -y libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info
 
