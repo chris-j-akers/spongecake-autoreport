@@ -1,5 +1,5 @@
 from weasyprint import HTML, CSS
-from weasyprint.fonts import FontConfiguration
+from weasyprint.text.fonts import FontConfiguration
 
 
 class SpongecakeReportGenerator:
